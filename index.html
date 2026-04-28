@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flash Game</title>
+<title>Binding of Isaac</title>
 
 <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
 
@@ -16,70 +16,31 @@ html, body {
   overflow: hidden;
 }
 
-#flash-container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: black;
-}
-
-#loading {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  font-family: Arial;
+#game {
+  width: 100vw;
+  height: 100vh;
 }
 </style>
 </head>
 
 <body>
 
-<div id="loading">Loading...</div>
-<div id="flash-container"></div>
+<div id="game"></div>
 
 <script>
-const container = document.getElementById("flash-container");
-const loading = document.getElementById("loading");
-
-function resizeGame() {
-  const w = window.innerWidth;
-  const h = window.innerHeight;
-  const ratio = 4 / 3;
-
-  let width = w;
-  let height = w / ratio;
-
-  if (height > h) {
-    height = h;
-    width = h * ratio;
-  }
-
-  container.style.width = width + "px";
-  container.style.height = height + "px";
-}
-
-window.addEventListener("resize", resizeGame);
-
 window.addEventListener("load", () => {
-  resizeGame();
-
   const ruffle = window.RufflePlayer.newest();
   const player = ruffle.createPlayer();
-  container.appendChild(player);
+
+  document.getElementById("game").appendChild(player);
 
   player.style.width = "100%";
   player.style.height = "100%";
 
-  player.load("https://archive.org/download/flash_game_archive/flash/Burrito%20Bison.swf")
-    .then(() => {
-      loading.remove();
-    })
+  player.load("https://archive.org/download/isaac-wrath-of-the-lamb/isaac-wotl.swf")
     .catch(err => {
       console.error(err);
-      loading.textContent = "Game failed to load";
+      document.body.innerHTML = "Failed to load game";
     });
 });
 </script>

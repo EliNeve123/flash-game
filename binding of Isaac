@@ -75,30 +75,14 @@ window.addEventListener("load", () => {
   player.style.width = "100%";
   player.style.height = "100%";
 
-  // try merged parts first
-  const parts = [
-    "tboiwotl-v1.666.swf.part1",
-    "tboiwotl-v1.666.swf.part2",
-    "tboiwotl-v1.666.swf.part3"
-  ];
-
-  Promise.all(parts.map(p => fetch(p).then(r => r.arrayBuffer())))
-    .then(buffers => {
-      const blob = new Blob(buffers, { type: "application/x-shockwave-flash" });
-      const url = URL.createObjectURL(blob);
-      return player.load(url);
-    })
+  // simplest working load
+  player.load("tboiwotl-v1.666.swf")
     .then(() => {
       loading.remove();
     })
-    .catch(() => {
-      // fallback to single file
-      player.load("tboiwotl-v1.666.swf")
-        .then(() => loading.remove())
-        .catch(err => {
-          loading.textContent = "Failed to load game";
-          console.error(err);
-        });
+    .catch(err => {
+      console.error(err);
+      loading.textContent = "Game failed to load";
     });
 });
 </script>

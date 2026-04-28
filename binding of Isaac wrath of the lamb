@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flash Game</title>
+
+<base href="https://cdn.jsdelivr.net/gh/bubbls/ugss@main/boilambeternal/">
+
+<script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  background: black;
+  height: 100%;
+  overflow: hidden;
+}
+
+#flash-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: black;
+}
+
+#loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-family: Arial;
+}
+</style>
+</head>
+
+<body>
+
+<div id="loading">Loading...</div>
+<div id="flash-container"></div>
+
+<script>
+const container = document.getElementById("flash-container");
+const loading = document.getElementById("loading");
+
+function resizeGame() {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const ratio = 4 / 3;
+
+  let width = w;
+  let height = w / ratio;
+
+  if (height > h) {
+    height = h;
+    width = h * ratio;
+  }
+
+  container.style.width = width + "px";
+  container.style.height = height + "px";
+}
+
+window.addEventListener("resize", resizeGame);
+
+window.addEventListener("load", () => {
+  resizeGame();
+
+  const ruffle = window.RufflePlayer.newest();
+  const player = ruffle.createPlayer();
+  container.appendChild(player);
+
+  player.style.width = "100%";
+  player.style.height = "100%";
+
+  // try merged parts first
+  const parts = [
+    "tboiwotl-v1.666.swf.part1",
+    "tboiwotl-v1.666.swf.part2",
+    "tboiwotl-v1.666.swf.part3"
+  ];
+
+  Promise.all(parts.map(p => fetch(p).then(r => r.arrayBuffer())))
+    .then(buffers => {
+      const blob = new Blob(buffers, { type: "application/x-shockwave-flash" });
+      const url = URL.createObjectURL(blob);
+      return player.load(url);
+    })
+    .then(() => {
+      loading.remove();
+    })
+    .catch(() => {
+      // fallback to single file
+      player.load("tboiwotl-v1.666.swf")
+        .then(() => loading.remove())
+        .catch(err => {
+          loading.textContent = "Failed to load game";
+          console.error(err);
+        });
+    });
+});
+</script>
+
+</body>
+</html>
